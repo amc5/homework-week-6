@@ -25,14 +25,13 @@ knitr::opts_chunk$set(
 # z= Phat-P0/SE(Phat) = Phat-P0/(sqrt(pq/n))
 # CI = estimate +- margin of error
 
-z.prop.test.() <- function(p1,n1,p2=NULL, n2=NULL, p0, alternative="two.sided", conf.level=0.95) #these are the functions arguments 
-  { 
-  if(p2=NULL||n2=NULL) { #this is a one-sample z test
+z.prop.test <- function(p1,n1,p2=NULL, n2=NULL, p0, alternative="two.sided", conf.level=0.95) #these are the functions arguments 
+  {
+  if((p2=NULL)||(n2=NULL)) { #this is a one-sample z test
   se.p1<- sqrt((p0*1-p0)/n1)
   z<- (p1-p0)/se.p1 #this is the z test = (phat-p0/se(phat))
   p.val<- pnorm(z) #p value of test
   ci<- p1 + c(-1*((qnorm(((1-conf.level)/2)+ con.level))*se.p1), ((qnorm(((1-conf.level)/2)+ conf.level))*se.p1))
-  }
     if(n1*p1<=5||n1*(1-p1)<=5){ #check for the rules of thumb- data should be normally distributed, test will still run but the below cuidado message will be printed
       warning("CUIDADO: Sample may not be normally distributed, and does not meet assumptions for a Z-test") #end of the code for the one sample z test
     }
@@ -59,7 +58,8 @@ z.prop.test.() <- function(p1,n1,p2=NULL, n2=NULL, p0, alternative="two.sided", 
     p.val <- pnorm(z, lower.tail = TRUE) #calculates associated p value
   }
   return(list(z, p, ci))
-}  
+  }  
+}
 ```
 
 [2] The dataset from Kamilar and Cooper has in it a large number of variables related to life history and body size. For this exercise, the end aim is to fit a simple linear regression model to predict longevity ("MaxLongevity_m") measured in months from species' brain size ("Brain_Size_Species_Mean") measured in grams. Do the following for both longevity~brain size and log(longevity)~log(brain size).
@@ -152,7 +152,7 @@ g
 
 ##below is for the log transformed data
 log_hat <- predict(logm, newdata=data.frame(lg_brain_size=log(d$Brain_Size_Species_Mean)))
-log_hat
+head(log_hat)
 lg_df <- data.frame(cbind(log(d$Brain_Size_Species_Mean), log(d$MaxLongevity_m), log_hat))
 names(lg_df) <- c("x","y", "yhat")
 head(lg_df)
@@ -182,4 +182,4 @@ log_pi
 ##I do not trust the model to predict observations accurately for 800g brain weight.  Our data points are concentrated between 0g and 150g, therefore, the further our x value gets from those weights, the less reliable our model is at predicting the y.  The confidence intervals are too broad at 800g (they span 400 y-values) for the model to be trusted.
 ```
 *Looking at your two models, which do you think is better? Why?
-I think that the log transformed model is better because it normalizes the data via making it symmetrical.  Applying a log transformation to the data corrects the heavy left-skew of our data and brings extreme observations closer to a position of centrality.  This makes the data easier to analyze and makes the differences in data points less dramatic.
+#I think that the log transformed model is better because it normalizes the data via making it symmetrical.  Applying a log transformation to the data corrects the heavy left-skew of our data and brings extreme observations closer to a position of centrality.  This makes the data easier to analyze and makes the differences in data points less dramatic.
