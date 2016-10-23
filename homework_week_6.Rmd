@@ -13,22 +13,17 @@ knitr::opts_chunk$set(
     fig.path="img/"
 )
 ```
-
 [1] Write a simple R function, Z.prop.test(), that can perform one- or two-sample Z-tests for proportion data, using the following guidelines.
-
 *Your function should take the following arguments: p1 and n1 (no default) to pose as the estimated proportion and sample size (i.e., based on your sample data); p2 and n2 (both defaulting to NULL) that contain a second sample's proportion and sample size data in the event of a two-sample test; p0 (no default) as the expected value for the population proportion; and alternative (default "two.sided") and conf.level (default 0.95), to be used in the same way as in the function t.test().
 *When conducting a two-sample test, it should be p1 that is tested as being smaller or larger than p2 when alternative="less" or alternative="greater", the same as in the use of x and y in the function t.test().
 *The function should perform a one-sample Z-test using p1, n1, and p0 if either p2 or n2 (or both) is NULL.
 *The function should contain a check for the rules of thumb we have talked about ($n * p > 5$ and $n * (1-p) >5$) to ensure the validity of assuming the normal distribution in both the one- and two-sample settings. If this is violated, the function should still complete but it should also print an appropriate warning message.
 *The function should return a list containing the members Z (the test statistic), P (the appropriate p-value), and CI (the two-sided CI with respect to confidence level).
-
 #number one
 ```{r}
-#calculating z statistic equation: 
+# calculating z statistic equation
 # z= Phat-P0/SE(Phat) = Phat-P0/(sqrt(pq/n))
 # CI = estimate +- margin of error
-
-##Below is the chunk of code that I wrote using modules, book, internet to try to create the function that you asked for. I'm not sure how to check if it works because I don't have values to plug in (?).  The code below this is taken from the answer key of the book that I used to check/correct parts of my own code that I worked through.  I then worked through the code from the answer key to ensure that I understood everything that is going on.
 
 z.prop.test.() <- function(p1,n1,p2=NULL, n2=NULL, p0, alternative="two.sided", conf.level=0.95) #these are the functions arguments 
   { 
@@ -37,6 +32,7 @@ z.prop.test.() <- function(p1,n1,p2=NULL, n2=NULL, p0, alternative="two.sided", 
   z<- (p1-p0)/se.p1 #this is the z test = (phat-p0/se(phat))
   p.val<- pnorm(z) #p value of test
   ci<- p1 + c(-1*((qnorm(((1-conf.level)/2)+ con.level))*se.p1), ((qnorm(((1-conf.level)/2)+ conf.level))*se.p1))
+  }
     if(n1*p1<=5||n1*(1-p1)<=5){ #check for the rules of thumb- data should be normally distributed, test will still run but the below cuidado message will be printed
       warning("CUIDADO: Sample may not be normally distributed, and does not meet assumptions for a Z-test") #end of the code for the one sample z test
     }
@@ -62,41 +58,8 @@ z.prop.test.() <- function(p1,n1,p2=NULL, n2=NULL, p0, alternative="two.sided", 
   if(alternative== "less"){
     p.val <- pnorm(z, lower.tail = TRUE) #calculates associated p value
   }
-  }
   return(list(z, p, ci))
 }  
-
-  
-##below is from book
-z.prop.test() <- function(p1, n1, p2=NULL, n2=NULL, p0, alternative = "two.sided", conf.level = 0.95) #this sets up the function's arguments per the first set of instructions for the function
-  {
-  if(p2=NULL||n2=NULL){cat("One-samaple Z-test.\n")
-  if((n1*p1<=5)||(n1*(1-p)<=5))#check if data fits with rules of thumb, adequate sample size?
-    {warning("Warning: Sample may not be normally distributed to run the Z-test")
-  }
-    z<- (p1-p0)/sqrt(p0*(1-p0/n1)) #THIS IS THE Z TEST
-    ci<- p1+c(-1,1*qnorm(conf.level+(1-conf.level)/2)*sqrt(p0*(1-p0/n1))) #this sets up the confidence interval for the Z test
-  else{
-    cat("Two-sample Z-test.\n")
-    if(p1*n1<=5||n1*(1-p1)<=5||p2*n2<=5||n2*(1-p2<=5)) #this tests to see if the sample size is large enough to run the Z test
-    {warning("Sample size may not be large enough for normal distribution")}
-    p.star<- (p1*n1+p2*n2)/(n1+n2) #another value within the two-sample z-test, pooled proportion of probabilities
-    z<- (p1-p2-p0)/sqrt(p.star*(1-p.star)*(1/n1+1/n2)) #THIS IS THE TWO SAMPLE Z TEST
-    ci<- sort((p1-p2)+c(-1,1)*qnorm(conf.level+(1-conf.level)/2)*sqrt(p.star*(1-p.star)*(1/n1+1/n2))) #sets up confidence interval for two sample test
-  }
-  p<- pnorm(z) #whatever is left of the z statistic under normal distribution
-  if(alternative=="greater"){
-    p<- 1-p}
-  else if (alternative=="two.sided"){
-    if (z<0){
-      p<-2*p
-    }else{
-      p<-2*(1-p)
-    }
-  }
-  return(list(z=z,p=p,ci=ci))
-  }
-}
 ```
 
 [2] The dataset from Kamilar and Cooper has in it a large number of variables related to life history and body size. For this exercise, the end aim is to fit a simple linear regression model to predict longevity ("MaxLongevity_m") measured in months from species' brain size ("Brain_Size_Species_Mean") measured in grams. Do the following for both longevity~brain size and log(longevity)~log(brain size).
